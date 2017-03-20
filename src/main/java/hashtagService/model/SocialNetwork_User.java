@@ -1,6 +1,7 @@
 package hashtagService.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,4 +49,30 @@ public class SocialNetwork_User implements Serializable {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+	
+    @Override
+    public int hashCode() {
+        int result;
+        result = (int)(user.getId()/17 + socialNetwork.getId()/17);
+        return result;
+    }
+	
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SocialNetwork_User)) {
+            return false;
+        }
+        
+        if (o == this) {
+        	return true;
+        }
+
+        SocialNetwork_User otherSocialNetwork_User = (SocialNetwork_User) o;
+        
+        //Objects.equals contemplates the case where both parameters are null, returning true when that happens
+        return
+        	Objects.equals(user, otherSocialNetwork_User.user) &&
+            Objects.equals(socialNetwork, otherSocialNetwork_User.socialNetwork) &&
+            Objects.equals(userName, otherSocialNetwork_User.userName);
+    }
 }

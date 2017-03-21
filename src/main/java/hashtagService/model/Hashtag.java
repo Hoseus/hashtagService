@@ -9,12 +9,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="HASHTAG")
 public class Hashtag {
-	@Id
-	@GeneratedValue
-	@Column(name="ID")
 	private long id;
-	
-	@Column(name="NAME", nullable=false)
 	private String name;
 
 	public Hashtag() {
@@ -24,6 +19,9 @@ public class Hashtag {
 		this.name = name;
 	}
 
+	@Id
+	@GeneratedValue
+	@Column(name="ID", updatable = false, nullable = false)
 	public long getId() {
 		return this.id;
 	}
@@ -32,11 +30,12 @@ public class Hashtag {
 		this.id = id;
 	}
 
+	@Column(name="NAME", nullable=false)
 	public String getName() {
 		return this.name;
 	}
 
-	public void setCourseName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 }

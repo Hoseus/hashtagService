@@ -30,17 +30,15 @@ public class SocialNetworkDao {
 	}
 
 	public List<SocialNetwork> getAll() {
-		return entityManager.createQuery("SELECT * FROM SOCIALNETWORK", SocialNetwork.class).getResultList();
+		return entityManager.createQuery("SELECT * FROM SOCIAL_NETWORK", SocialNetwork.class).getResultList();
 	}
 	  
 	public SocialNetwork getById(long id) {
 		return entityManager.find(SocialNetwork.class, id);
 	}
 
-	public SocialNetwork getByName(String socialNetworkName) {		
-		return (SocialNetwork) entityManager.createQuery(
-				"SELECT * FROM SOCIALNETWORK WHERE NAME = :socialNetworkName"
-			).getSingleResult();
+	public SocialNetwork getByName(String name) {
+		return entityManager.find(SocialNetwork.class, name);
 	}
 
 	public void update(SocialNetwork socialNetwork) {

@@ -18,6 +18,11 @@ public class Hashtag {
 	public Hashtag(String name) {
 		this.name = name;
 	}
+	
+	public Hashtag(long id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
 	@Id
 	@GeneratedValue
@@ -30,7 +35,7 @@ public class Hashtag {
 		this.id = id;
 	}
 
-	@Column(name="NAME", nullable=false)
+	@Column(name="NAME", nullable=false, unique=true)
 	public String getName() {
 		return this.name;
 	}

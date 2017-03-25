@@ -1,15 +1,17 @@
 package hashtagService;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 import hashtagService.model.HashtagLoggerThreadStarter;
+import hashtagService.model.InstagramPost;
 import hashtagService.repository.HashtagRepository;
 
 @SpringBootApplication

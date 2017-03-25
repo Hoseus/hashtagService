@@ -27,7 +27,7 @@ public class InstagramPost {
 		this.pagination = pagination;
 	}
 	
-	public List<String> getAllTexts() {
+	public List<String> allTexts() {
 		ArrayList<String> allTexts = new ArrayList<String>();
 		
 		for(PostData aPostData : postDatas) {

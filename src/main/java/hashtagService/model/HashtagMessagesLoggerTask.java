@@ -13,10 +13,10 @@ import hashtagService.Application;
 public class HashtagMessagesLoggerTask implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(HashtagMessagesLoggerTask.class);
 	private FileWriter fileWriter;
-	private Hashtag hashtag;
+	private String hashtagName;
 
-	public HashtagMessagesLoggerTask(Hashtag hashtag, FileWriter fileWriter) {
-		this.hashtag = hashtag;
+	public HashtagMessagesLoggerTask(String hashtagName, FileWriter fileWriter) {
+		this.hashtagName = hashtagName;
 		this.fileWriter = fileWriter;
 	}
 	
@@ -24,45 +24,50 @@ public class HashtagMessagesLoggerTask implements Runnable {
 	public void run() {
 		boolean runAgain = true;
 		String logPrefix = buidLogPrefix();
-		String separator = "\n\n===================================================================================================\n\n\n";		
-		InstagramPost instagramPost = getInstagramPost();
+		String separator = "\n\n===================================================================================================\n\n\n";
+		String mintagId = null;
 		
-		try {
-			for(String aText : instagramPost.getAllTexts()) {
-				log.info(logPrefix + aText + separator);
-				fileWriter.write(logPrefix + aText + separator);
-				fileWriter.flush();
-			}
+		while(runAgain) {
+			InstagramPost instagramPost = getInstagramPost(mintagId);
+		
+			try {
+				for(String aText : instagramPost.allTexts()) {
+					log.info(logPrefix + aText + separator);
+					fileWriter.write(logPrefix + aText + separator);
+					fileWriter.flush();
+				}
 
-			//Sleeps for 2 minutes, then starts over with the file logs
-			Thread.sleep(120000);
-		} catch (Exception e) {
-			log.error(e.toString());
-			runAgain = false;
+				//Sleeps for 2 minutes, then starts over logging information
+				Thread.sleep(120000);
+			} catch (Exception e) {
+				log.error(e.toString());
+				runAgain = false;
+			}
 		}
 	}
 	
 	private String buidLogPrefix() {
-		String hashtagName = hashtag.getName();
-		String separator = "===================================================================================================\n";
+		String separator = "===================================================================================================\n\n";
 		
 		separator.substring(hashtagName.length() + 1);
-		return "\n#" + hashtagName + " " + separator + "\n";
+		return "\n#" + hashtagName + " " + separator;
 	}
 	
-	private InstagramPost getInstagramPost() {
+	private InstagramPost getInstagramPost(String minTagId) {
 		String accessToken = Application.getAccessToken();
-		String uri = "https://api.instagram.com/v1/tags/{tag-name}/media/recent?count={count}&access_token={access_token}";
+		String uri = "http://localhost:8181/messages?name={tag-name}&count={count}";
 		
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("tag-name", hashtag.getName());
-		map.put("count", "4");
-		//map.put("min_tag_id", "9");
-		//map.put("max_tag_id", "10");
+		map.put("tag-name", hashtagName);
+		map.put("count", "10");
 		map.put("access_token", accessToken);
-		
+		//map.put("max_tag_id", "10");
+		if(minTagId != null) {
+			map.put("min_tag_id", minTagId);
+			uri = uri + "&min_tag_id={min_tag_id}";
+		}
 		RestTemplate restTemplate = new RestTemplate();
-
+		
 		return restTemplate.getForObject(uri, InstagramPost.class, map);
 	}
 }

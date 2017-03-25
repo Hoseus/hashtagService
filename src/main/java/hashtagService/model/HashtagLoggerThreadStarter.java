@@ -19,15 +19,15 @@ public class HashtagLoggerThreadStarter {
 	public void showHashtags(FileWriter fileWriter, List<Hashtag> hashtags) {		
 		ThreadPoolTaskExecutor executor = getThreadTaskExecutor();
 
+		/*
+		 * Levanto un thread por cada hashtag para que puedan logear en paralelo.
+		 * Ademas, esto va a servir para el stream de mensajes de un hashtag especifico
+		 */
 		for (Hashtag aHashtag : hashtags) {
-			/*
-			 *Levanto un thread por cada hashtag para que puedan logear en paralelo.
-			 *Ademas, esto va a servir para el stream de mensajes de un hashtag especifico
-			 */
 			executor.setThreadNamePrefix("HashtagMessageLogger-" + aHashtag.getName() + "-");
 
 			//TODO puede ser que el thread conozca al intermediario y se mate si pasa algo
-			executor.execute(new HashtagMessagesLoggerTask(aHashtag, fileWriter));
+			executor.execute(new HashtagMessagesLoggerTask(aHashtag.getName(), fileWriter));
 		}
 
 		showHashtags(fileWriter);
@@ -35,6 +35,7 @@ public class HashtagLoggerThreadStarter {
 	
 	public void showHashtags(FileWriter fileWriter) {	
 		ThreadPoolTaskExecutor executor = getThreadTaskExecutor();
+		
 		while(true) {
 			
 		}

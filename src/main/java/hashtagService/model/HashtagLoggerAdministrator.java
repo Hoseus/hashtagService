@@ -43,10 +43,6 @@ public class HashtagLoggerAdministrator {
 	public Set<HashtagLogger> getHashtagLoggers() {
 		return hashtagLoggers;
 	}
-	
-	public Set<HashtagLogger> setHashtagLoggers(Set<HashtagLogger> hashtagLoggers) {
-		return this.hashtagLoggers = hashtagLoggers;
-	}
 
 	public void addHashtags(List<Hashtag> hashtags) {
 		for (Hashtag aHashtag : hashtags) {
@@ -81,8 +77,10 @@ public class HashtagLoggerAdministrator {
 	public void logHashtagTexts() {
 		while(true) {
 			try {
-				//Wait
+				//Wait - This wait will stop this loop when the hashtagLoggers collection is empty
 				semaphore.acquire();
+				//Signal
+				semaphore.release();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -92,9 +90,6 @@ public class HashtagLoggerAdministrator {
 					aHashtagLogger.logTexts();
 				}
 			}
-			
-			//Signal
-			semaphore.release();
 			
 			//Sleeps for 2 minutes, then starts over logging information
 			try {

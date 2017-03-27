@@ -21,7 +21,8 @@ Instrucciones para el uso de la aplicacion:
 	* localhost:8181/dashboard
 
 3) El archivo que se genera es llamado instagramMessages.txt y se genera en el working directory desde el que se ejecuta el programa.
-   El formato de loggeo es el siguiente:
+   El formato de loggeo es el siguiente: 
+
    #nombreHashtag ================================================
 
    texto del mensaje aqui

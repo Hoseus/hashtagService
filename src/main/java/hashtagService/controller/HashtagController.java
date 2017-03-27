@@ -10,12 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import hashtagService.Application;
 import hashtagService.model.Hashtag;
-import hashtagService.model.HashtagLoggerThreadStarter;
-import hashtagService.model.InstagramPost;
+import hashtagService.model.HashtagLoggerAdministrator;
+import hashtagService.model.HashtagLogger;
+import hashtagService.model.TagRecentMedia;
 import hashtagService.repository.HashtagRepository;
 
 @RestController
@@ -25,39 +24,57 @@ public class HashtagController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
 	public String createHashtag(@RequestParam(value = "name", required = true) String name) {
-		HashtagLoggerThreadStarter.getInstance();
-		hashtagRepository.save(new Hashtag(name));
+		Hashtag hashtag = new Hashtag(name);
+		hashtagRepository.save(hashtag);
+		HashtagLoggerAdministrator.getInstance().addHashtag(hashtag);
 		
 		return "Hashtag created successfully";
 	}
 
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
 	public String deleteHashtag(@RequestParam(value = "name", required = true) String name) {
-		hashtagRepository.delete(hashtagRepository.findByName(name));
+		Hashtag hashtag = hashtagRepository.findByName(name);
+		hashtagRepository.delete(hashtag);
+		HashtagLoggerAdministrator.getInstance().removeHashtag(hashtag);
 		
 		return "Hashtag deleted successfully";
 	}
 
 	@RequestMapping(value = "/rename", method = RequestMethod.GET)
 	public String renameHashtag(@RequestParam(value = "oldName", required = true) String oldName, @RequestParam(value = "newName", required = true) String newName) {
-		hashtagRepository.update(hashtagRepository.findByName(oldName), newName);
+		Hashtag oldHashtag = hashtagRepository.findByName(oldName);
+		Hashtag newHashtag = hashtagRepository.update(oldHashtag, newName);
+		HashtagLoggerAdministrator.getInstance().removeHashtag(oldHashtag);
+		HashtagLoggerAdministrator.getInstance().addHashtag(newHashtag);
 		
 		return "Hashtag renamed successfully";
 	}
 	
 	@RequestMapping(value = "/messages", method = RequestMethod.GET)
-	public InstagramPost showMessages(@RequestParam(value = "name", required = true) String name, @RequestParam(value = "count", required = true) String count, @RequestParam(value = "min_tag_id", required = false) String minTagId) throws JsonProcessingException {
-		InstagramPost instagramPost = getInstagramPost(name, count, minTagId);
+	public TagRecentMedia showMessages(@RequestParam(value = "name", required = true) String name, @RequestParam(value = "count", required = true) String count, @RequestParam(value = "min_tag_id", required = false) String minTagId) {
+		TagRecentMedia instagramPost = getTagRecentMedia(name, count, minTagId);
 		
-		return instagramPost;		
+		return instagramPost;
 	}
 	
 	@RequestMapping(value = "/dashboard", method = RequestMethod.GET)
-	public void showDashboard(@RequestParam(value = "name", required = true) String name) {
+	public String showDashboard() {
+		String dashboard = "";
+		String suscripcionesPorHashtag = "";
+		String cantidadSuscripciones = "";
 		
+		cantidadSuscripciones = String.format("Cantidad de suscripciones: %d", hashtagRepository.count());
+		cantidadSuscripciones = cantidadSuscripciones + "\n";
+		for(HashtagLogger aHashtagLogger : HashtagLoggerAdministrator.getInstance().getHashtagLoggers()) {
+			suscripcionesPorHashtag = suscripcionesPorHashtag + String.format(aHashtagLogger.getHashtag().getName() + ": %d", aHashtagLogger.getTextCount());
+			suscripcionesPorHashtag = suscripcionesPorHashtag + "\n";
+		}
+		dashboard = cantidadSuscripciones + suscripcionesPorHashtag;
+		
+		return dashboard;
 	}
 	
-	private InstagramPost getInstagramPost(String hashtagName, String count, String minTagId) {
+	private TagRecentMedia getTagRecentMedia(String hashtagName, String count, String minTagId) {
 		String accessToken = Application.getAccessToken();
 		String uri = "https://api.instagram.com/v1/tags/{tag-name}/media/recent?count={count}&access_token={access_token}";
 			
@@ -71,6 +88,6 @@ public class HashtagController {
 			uri = uri + "&min_tag_id={min_tag_id}";
 		}
 
-		return new RestTemplate().getForObject(uri, InstagramPost.class, map);
+		return new RestTemplate().getForObject(uri, TagRecentMedia.class, map);
 	}
 }

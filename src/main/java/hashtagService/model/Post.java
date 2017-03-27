@@ -1,10 +1,11 @@
 package hashtagService.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PostData {
+public class Post {
 	@JsonProperty("caption")
 	private Caption caption;
 
@@ -16,12 +17,8 @@ public class PostData {
 		this.caption = caption;
 	}
 	
+	@JsonIgnore
 	public String getText() {
 		return caption.getText();
 	}
-	
-    @Override
-    public String toString() {    	
-        return String.format("		PostData : {\n%s\n		}", caption.toString());
-    }
 }

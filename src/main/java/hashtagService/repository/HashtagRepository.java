@@ -13,8 +13,3 @@ public interface HashtagRepository extends CrudRepository<Hashtag, Long>, Hashta
 	public Hashtag findByName(String name);
 	public List<Hashtag> findAll();
 }
-
-//TODO puede ser util
-/*    @Query(value = "SELECT * FROM collection WHERE season=:season LIMIT :count", nativeQuery = true)
-List<Collection> findCollectionsForSeason(@Param("season") int season, @Param("count") int count);
-}*/

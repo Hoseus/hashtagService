@@ -15,9 +15,4 @@ public class Caption {
 	public void setText(String text) {
 		this.text = text;
 	}
-	
-    @Override
-    public String toString() {    	
-        return String.format("			Caption : {\n				Text : %s\n			}", text);
-    }
 }

@@ -15,9 +15,4 @@ public class Pagination {
 	public void setMinTagId(String minTagId) {
 		this.minTagId = minTagId;
 	}
-	
-    @Override
-    public String toString() {    	
-        return String.format("	Pagination : {\n		min_tag_id : %s\n	}", minTagId);
-    }
 }

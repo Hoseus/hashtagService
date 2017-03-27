@@ -14,6 +14,7 @@ public class HashtagLoggerAdministrator {
 	private FileWriter fileWriter;
 	private Set<HashtagLogger> hashtagLoggers;
 	Semaphore semaphore;
+	private Object lock = new Object();
 	private static final Logger log = LoggerFactory.getLogger(HashtagLoggerAdministrator.class);
 	
 	public static HashtagLoggerAdministrator getInstance() {
@@ -55,21 +56,26 @@ public class HashtagLoggerAdministrator {
 	
 	public void addHashtag(Hashtag hashtag) {
 		HashtagLogger hashtagLogger = new HashtagLogger(hashtag, fileWriter);
-		hashtagLoggers.add(hashtagLogger);
+		synchronized(lock) {
+			hashtagLoggers.add(hashtagLogger);
+		}
 		
 		//Signal
 		semaphore.release();
 	}
 	
 	public void removeHashtag(Hashtag hashtag) {
-		HashtagLogger hashtagLogger = hashtagLoggers.stream().filter(aHashtagLogger -> aHashtagLogger.getHashtag().getId() == hashtag.getId()).findFirst().get();
+		synchronized(lock) {
+			HashtagLogger hashtagLogger = hashtagLoggers.stream().filter(aHashtagLogger -> aHashtagLogger.getHashtag().getId() == hashtag.getId()).findFirst().get();
+			hashtagLoggers.remove(hashtagLogger);
+		}
+		
 		try {
 			//Wait
 			semaphore.acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		hashtagLoggers.remove(hashtagLogger);
 	}
 	
 	public void logHashtagTexts() {
@@ -81,16 +87,18 @@ public class HashtagLoggerAdministrator {
 				e.printStackTrace();
 			}
 			
-			for(HashtagLogger aHashtagLogger : hashtagLoggers) {
-				aHashtagLogger.logTexts();
+			synchronized(lock) {
+				for(HashtagLogger aHashtagLogger : hashtagLoggers) {
+					aHashtagLogger.logTexts();
+				}
 			}
+			
 			//Signal
 			semaphore.release();
 			
 			//Sleeps for 2 minutes, then starts over logging information
 			try {
-				//Thread.sleep(120000);
-				Thread.sleep(10000);
+				Thread.sleep(120000);
 			} catch (InterruptedException e) {
 				log.error(e.toString());
 			}
